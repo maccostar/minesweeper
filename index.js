@@ -25,6 +25,7 @@ let board = [...Array(xy_len)].map(function(a){
         return {
             opened : false,
             hasBomb : false,
+            owner : "none",
             class : "N"
         }
 })})
@@ -64,6 +65,7 @@ let start = function(){
             //全部非表示にする
             board[y][x].opened = false
 
+            /* もうちょっとおしゃれにできるはず */
             let count = 0;
             if (y-1 > 0 && x-1 > 0      ){if (board[y-1][x-1].hasBomb == true){count += 1}} 
             if (y-1 > 0                 ){if (board[y-1][x].hasBomb == true ){count += 1}}
@@ -79,8 +81,6 @@ let start = function(){
         }
     }
 }
-
-    
 
 
 
@@ -110,6 +110,14 @@ let select = function(x,y){
     } else { board[y][x].opened = true }
 }
 
+let explosion = function(x,y){
+    if(board[y][x].hasBomb == true ){
+        return "NG"
+    } else {
+        return "OK"
+    }
+}
+
 /* 3.getメソッドの定義*/
 app.get('/board',(req,res) => {
     const x = req.query.x
@@ -119,7 +127,10 @@ app.get('/board',(req,res) => {
     if ( button == "start"){ start()}
 
     //xyを選択したとき
-    if (x && y){ select(x,y) }
+    if (x && y){ 
+        select(x,y) 
+        console.log(explosion(x,y))
+    }
 
     //res.json(board0);
     //countup(x,y);
