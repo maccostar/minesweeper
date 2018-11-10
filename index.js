@@ -65,19 +65,28 @@ let start = function(){
             //全部非表示にする
             board[y][x].opened = false
 
-            /* もうちょっとおしゃれにできるはず */
-            let count = 0;
-            if (y-1 > 0 && x-1 > 0      ){if (board[y-1][x-1].hasBomb == true){count += 1}} 
-            if (y-1 > 0                 ){if (board[y-1][x].hasBomb == true ){count += 1}}
-            if (y-1 > 0 && x+1 < xy_len ){if (board[y-1][x+1].hasBomb == true){count += 1}}             
-            if (x-1 > 0                 ){if (board[y][x-1].hasBomb == true){count += 1}}
-            if (x+1 < xy_len            ){if (board[y][x+1].hasBomb == true){count += 1}} 
-            if (y+1 < xy_len && x-1 > 0 ){if (board[y+1][x-1].hasBomb == true){count += 1}} 
-            if (y+1 < xy_len            ){if (board[y+1][x].hasBomb == true){count += 1}} 
-            if (y+1 < xy_len && x+1 < xy_len){if (board[y+1][x+1].hasBomb == true ){count += 1}}
+            const directions =[
+                [-1,-1],
+                [0,-1],
+                [1,-1],
+                [-1,0],
+                [1,0], 
+                [-1,1],
+                [0,1],
+                [1,1]
+            ]
 
+            let count = 0;
+            for(let i = 0 ; i < directions.length; i++){
+                let arround_x = x + directions[i][0]
+                let arround_y = y + directions[i][1]
+                //console.log(arround_x,arround_y)
+                if ( 0 < arround_x && arround_x < xy_len && 0 < arround_y && arround_y < xy_len ){ if (board[arround_y][arround_x].hasBomb == true){ count += 1 }}
+            }
             //表示数をセットする
             if (board[y][x].hasBomb == true ){ board[y][x].class = "B"} else { board[y][x].class = String(count)}
+
+
         }
     }
 }
