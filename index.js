@@ -2,6 +2,22 @@
 var express = require("express")
 var app = express()
 
+//これはいけなかった
+//express.static(__dirname + '/static/')
+
+//これでもいける
+//app.use(express.static('./static/'))
+app.use(express.static('./static/'))
+
+/*
+//原始的表示設定
+const fs = require('fs')
+const path = require('path')
+const htmlPath = path.join(__dirname,'./static/index.html')
+const html = fs.readFileSync(htmlPath,'utf8')
+// console.log(htmlPath)
+// console.log(html)
+*/
 
 /*2. 盤面の設定 */
 /* 設定 */
@@ -122,7 +138,7 @@ let select = function(_x,_y){
             for(let i = 0 ; i < directions.length; i++){
                 let arround_x = x + directions[i][0]
                 let arround_y = y + directions[i][1]
-                console.log("再帰チェック",arround_x,arround_y)
+                //console.log("再帰チェック",arround_x,arround_y)
                 if ( 0 <= arround_x && arround_x < xy_len  && 0 <= arround_y && arround_y < xy_len ){ select(arround_x,arround_y) }
                 //if ( 0 <= arround_x && arround_x < xy_len  && 0 <= arround_y && arround_y < xy_len && board[arround_y][arround_x].class == "0" ){ select(arround_x,arround_y) }
             }
@@ -142,8 +158,34 @@ let explosion = function(x,y){
 
 /* 3.getメソッドの定義*/
 
-app.use(express.static(__dirname + '/public/main.html'))
-//http://localhost:8000/board/public/main.html が見れないので先に違うところを開発する
+/*
+//原始的な表示方法①
+app.get('/',(req,res) => {
+ res.send(`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="UTF-8">
+            </head>
+            <body>
+                <div id="app"></div>
+                <style>
+                </style>
+                <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+                <script>
+                </script>
+            </body>
+        </html> 
+ `)
+})
+*/
+
+/*
+//原始的な表示方法②
+app.get('/',(req,res) => {
+ res.send(html)
+})
+*/
 
 app.get('/board',(req,res) => {
     const x = req.query.x
