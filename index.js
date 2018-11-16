@@ -42,6 +42,7 @@ let board = [...Array(xy_len)].map(function(a){
             return {
                 opened : false,
                 hasBomb : false,
+                hasFlag : false,
                 owner : "none",
                 class : "N"
             }
@@ -85,6 +86,7 @@ let start = function(){
         for(let y =0; y <xy_len; y++){
             //全部非表示にする
             board[y][x].opened = false
+            board[y][x].hasFlag = false
             //検証用
             //board[y][x].opened = true
 
@@ -112,7 +114,9 @@ let load = function(){
         return elem.map((elem, idx, arr) => {
             //console.log(elem)
             //return elem.class
-            if (elem.opened == true){ return elem.class } else {return "h" }
+            if (elem.opened == true){ return elem.class } 
+            else if (elem.hasFlag == true){return "F"} 
+            else {return "" }
             
         })
     })
@@ -147,14 +151,20 @@ let select = function(_x,_y){
 }
 
 //爆発
-let explosion = function(x,y){
-    if(board[y][x].hasBomb == true ){
+let explosion = function(_x,_y){
+    if(board[_y][_x].hasBomb == true ){
         return "NG"
     } else {
         return "OK"
     }
 }
 
+let flag = function(_x,_y){
+    const x = Number(_x)
+    const y = Number(_y)
+
+    board[y][x].hasFlag = true
+}
 
 /* 3.getメソッドの定義*/
 
@@ -196,11 +206,17 @@ app.get('/start',(req,res) => {
 app.get('/board',(req,res) => {
     const x = req.query.x
     const y = req.query.y
+    const clickMode = req.query.select
 
     //xyを選択したとき
-    if (x && y){ 
-        select(x,y) 
-        console.log(explosion(x,y))
+    if (x && y){
+        if (clickMode == "left"){
+            select(x,y) 
+            console.log(explosion(x,y))    
+        } else if (clickMode == "right"){
+            flag(x,y)
+            //console.log("右クリック")
+        }
     }
 
     //res.json(board0);
@@ -208,6 +224,7 @@ app.get('/board',(req,res) => {
     //res.json(board0[y][x]);
     res.json(load())
 })
+
 
 /* 4. listen()メソッドを実行して8000番ポートで待ち受け。*/
 app.listen(8000)
