@@ -187,12 +187,15 @@ app.get('/',(req,res) => {
 })
 */
 
+app.get('/start',(req,res) => {
+    //スタートボタンが押された時
+    start()
+    res.json(load())
+})
+
 app.get('/board',(req,res) => {
     const x = req.query.x
     const y = req.query.y
-    const button = req.query.button
-    //スタートボタンが押された時だけ実行する
-    if ( button == "start"){ start()}
 
     //xyを選択したとき
     if (x && y){ 
