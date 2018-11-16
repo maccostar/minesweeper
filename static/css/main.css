@@ -8,3 +8,7 @@
   .box:hover{
     border: 4px ridge;
   }
+
+div{
+    margin: 10px;
+  }

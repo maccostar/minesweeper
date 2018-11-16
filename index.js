@@ -87,6 +87,7 @@ let start = function(){
             //全部非表示にする
             board[y][x].opened = false
             board[y][x].hasFlag = false
+            board[y][x].owner = "none"
             //検証用
             //board[y][x].opened = true
 
@@ -97,7 +98,6 @@ let start = function(){
             for(let i = 0 ; i < directions.length; i++){
                 let arround_x = x + directions[i][0]
                 let arround_y = y + directions[i][1]
-                //console.log(arround_x,arround_y)
                 if ( 0 <= arround_x && arround_x < xy_len && 0 <= arround_y && arround_y < xy_len ){ if (board[arround_y][arround_x].hasBomb == true){ count += 1 }}
             }
             //表示数をセットする
@@ -112,8 +112,6 @@ let start = function(){
 let load = function(){
     let display = board.map((elem, idx, arr) => { 
         return elem.map((elem, idx, arr) => {
-            //console.log(elem)
-            //return elem.class
             if (elem.opened == true){ return elem.class } 
             else if (elem.hasFlag == true){return "F"} 
             else {return "" }
@@ -121,18 +119,19 @@ let load = function(){
         })
     })
     return display
-    //console.log(display)
 }
 
 
-let select = function(_x,_y){
+let select = function(_x,_y,_username){
     const x = Number(_x)
     const y = Number(_y)
+    const username = _username
 
     if( board[y][x].opened == true ){ 
         'alert("すでに開いています") '
     } else {
          board[y][x].opened = true 
+         board[y][x].owner = username
         
          if (board[y][x].class == "0" ){
             //周囲の相対的座標
@@ -142,9 +141,7 @@ let select = function(_x,_y){
             for(let i = 0 ; i < directions.length; i++){
                 let arround_x = x + directions[i][0]
                 let arround_y = y + directions[i][1]
-                //console.log("再帰チェック",arround_x,arround_y)
-                if ( 0 <= arround_x && arround_x < xy_len  && 0 <= arround_y && arround_y < xy_len ){ select(arround_x,arround_y) }
-                //if ( 0 <= arround_x && arround_x < xy_len  && 0 <= arround_y && arround_y < xy_len && board[arround_y][arround_x].class == "0" ){ select(arround_x,arround_y) }
+                if ( 0 <= arround_x && arround_x < xy_len  && 0 <= arround_y && arround_y < xy_len ){ select(arround_x,arround_y,username) }
             }
         }
     }
@@ -153,16 +150,21 @@ let select = function(_x,_y){
 //爆発
 let explosion = function(_x,_y){
     if(board[_y][_x].hasBomb == true ){
-        return "NG"
-    } else {
-        return "OK"
+        for (let x =0; x <xy_len; x++ ){
+            for(let y =0; y <xy_len; y++){
+                //爆弾をすべてオープンにする
+                if(board[y][x].hasBomb == true ){ board[y][x].opened = true}
+            }
+        }
     }
 }
 
-let flag = function(_x,_y){
+let flag = function(_x,_y,_username){
     const x = Number(_x)
     const y = Number(_y)
-    board[y][x].hasFlag = !board[y][x].hasFlag    
+    const username = _username
+    board[y][x].hasFlag = !board[y][x].hasFlag 
+    if(board[y][x].hasFlag){ board[y][x].owner = username } else { board[y][x].owner = "none" }
 }
 
 /* 3.getメソッドの定義*/
@@ -206,15 +208,15 @@ app.get('/board',(req,res) => {
     const x = req.query.x
     const y = req.query.y
     const clickMode = req.query.select
+    const username = req.query.username
 
     //xyを選択したとき
     if (x && y){
         if (clickMode == "left"){
-            select(x,y) 
-            console.log(explosion(x,y))    
+            select(x,y,username) 
+            explosion(x,y)   
         } else if (clickMode == "right"){
-            flag(x,y)
-            //console.log("右クリック")
+            flag(x,y,username)
         }
     }
 
