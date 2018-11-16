@@ -162,8 +162,7 @@ let explosion = function(_x,_y){
 let flag = function(_x,_y){
     const x = Number(_x)
     const y = Number(_y)
-
-    board[y][x].hasFlag = true
+    board[y][x].hasFlag = !board[y][x].hasFlag    
 }
 
 /* 3.getメソッドの定義*/
